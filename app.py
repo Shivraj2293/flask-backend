@@ -3,10 +3,8 @@ from PIL import Image
 from dotenv import load_dotenv
 import os
 
-# Import utility functions
+# Import only the necessary utility functions (removed model-related functions)
 from utils.model_utils import (
-    load_model_from_drive,
-    predict_food_from_image,
     input_image_setup,
     get_gemini_response
 )
@@ -16,10 +14,6 @@ load_dotenv(dotenv_path='instance/.env')
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise Exception("Google API key not found. Set it in your .env file.")
-
-# Download and load the model
-# Download and load the model
-model = load_model_from_drive("food_classifier.h5")
 
 # Flask App Setup
 app = Flask(__name__)
@@ -35,35 +29,27 @@ def upload_file():
 
     image = request.files['image']
     try:
+        # Open and convert the image to RGB
         img = Image.open(image.stream).convert('RGB')
         
-        # Predict food item
-        predicted_food, confidence = predict_food_from_image(model, img)
-        confidence_threshold = 0.7
+        # Since the TensorFlow model is removed, we no longer perform food prediction.
+        # Instead, we set the predicted food to a generic label.
+        predicted_food = "this food item"
         
-        # Prepare image data for Gemini
+        # Reset the stream and prepare the image data for the Gemini API.
         image.seek(0)
         image_data = input_image_setup(image)
         
-        # Generate prompt for Gemini API
-        if predicted_food == "unknown" or confidence < confidence_threshold:
-            predicted_food = "this food item"
-            prompt = (
-                "Identify the food item and analyze its nutritional content. "
-                "Provide an estimated breakdown of Calories, Protein (g), Carbohydrates (g), "
-                "Fats (g), Fiber (g), and Sugars (g). Additionally, include dietary recommendations tailored to Indian cuisine."
-            )
-        else:
-            prompt = (
-                f"Analyze the nutritional content of {predicted_food}. "
-                "Provide an estimated breakdown of Calories, Protein (g), Carbohydrates (g), "
-                "Fats (g), Fiber (g), and Sugars (g), along with dietary recommendations."
-            )
+        # Use the same prompt as before to analyze nutritional content.
+        prompt = (
+            "Identify the food item and analyze its nutritional content. "
+            "Provide an estimated breakdown of Calories, Protein (g), Carbohydrates (g), "
+            "Fats (g), Fiber (g), and Sugars (g). Additionally, include dietary recommendations tailored to Indian cuisine."
+        )
         
         nutritional_response = get_gemini_response(predicted_food, image_data, prompt, GOOGLE_API_KEY)
         return jsonify({
             "predicted_food": predicted_food,
-            "confidence": confidence,
             "nutritional_info": nutritional_response
         }), 200
 
