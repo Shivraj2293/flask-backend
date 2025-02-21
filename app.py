@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-app = Flask(__name__)
 from PIL import Image
 from dotenv import load_dotenv
 import os
@@ -23,7 +22,7 @@ if not GOOGLE_API_KEY:
 model = load_model_from_drive("food_classifier.h5")
 
 # Flask App Setup
-
+app = Flask(__name__)
 
 @app.route('/ping', methods=['GET'])
 def ping():
