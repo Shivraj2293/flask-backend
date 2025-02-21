@@ -8,11 +8,13 @@ import google.generativeai as genai
 # Load and Download Model
 
 # Load and Download Model
+# Load and Download Model
 def load_model_from_drive(output_file):
     model_url = "https://drive.google.com/uc?id=1qA1xQlbTHUiWm3JVY2vLTt4HKSxi8Kez"
     if not os.path.exists(output_file):
-        gdown.download(model_url, output_file, quiet=False)
+        gdown.download(model_url, output_file, quiet=False, fuzzy=True)
     return tf.keras.models.load_model(output_file)
+
 
 
 # Class labels for prediction
