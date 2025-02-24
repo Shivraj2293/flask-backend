@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+*.pyo
+.env
+
+food_classifier.h5
